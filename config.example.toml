@@ -1,0 +1,11 @@
+# 安装包用此公开默认值生成 config.toml；不要覆盖已有的个人配置。
+[plugin]
+enabled = true
+config_version = "0.1.0"
+
+[limits]
+cache_capacity = 4096
+cache_ttl_seconds = 600
+concurrency = 8
+scan_limit = 1000
+result_limit = 20

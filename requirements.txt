@@ -1,0 +1,2 @@
+maibot-plugin-sdk==2.16.0
+tomlkit>=0.13.3

@@ -1,0 +1,21 @@
+[project]
+name = "maibot-stable-identity"
+version = "0.2.5"
+authors = [{name = "Zero"}]
+requires-python = ">=3.12"
+dependencies = ["maibot-plugin-sdk==2.16.0", "tomlkit>=0.13.3"]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff", "jsonschema", "packaging", "structlog", "tomlkit", "rich", "colorama", "msgpack>=1"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "B"]
+ignore = ["E501"]

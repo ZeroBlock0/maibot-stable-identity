@@ -1,0 +1,39 @@
+{
+  "manifest_version": 2,
+  "id": "local.stable-identity",
+  "name": "稳定身份与原话查证",
+  "version": "0.2.5",
+  "description": "按平台和真实用户 ID 标注可核验聊天消息，并提供限定会话的原始发言查证。",
+  "author": {
+    "name": "Zero",
+    "url": "https://github.com/ZeroBlock0"
+  },
+  "license": "GPL-3.0-or-later",
+  "host_application": {
+    "min_version": "1.3.15",
+    "max_version": "1.3.15"
+  },
+  "sdk": {
+    "min_version": "2.16.0",
+    "max_version": "2.16.0"
+  },
+  "dependencies": [],
+  "urls": {
+    "repository": "https://github.com/ZeroBlock0/maibot-stable-identity",
+    "homepage": "https://github.com/ZeroBlock0/maibot-stable-identity",
+    "documentation": "https://github.com/ZeroBlock0/maibot-stable-identity/blob/main/README.md",
+    "issues": "https://github.com/ZeroBlock0/maibot-stable-identity/issues"
+  },
+  "i18n": {
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ]
+  },
+  "capabilities": [
+    "database.get",
+    "message.get_by_time_in_chat",
+    "message.get_by_id",
+    "person.get_id"
+  ]
+}

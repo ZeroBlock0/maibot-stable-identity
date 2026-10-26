@@ -1,0 +1,55 @@
+name: Plugin tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-integration:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Mai-with-u/MaiBot
+          ref: 062d45cf8bd4272ac57d7ec03fcf405e5a458211
+          path: .references/host
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Mai-with-u/maibot-plugin-sdk
+          ref: 835e0e9d1f70ea00885fb49d059f7f2864976d05
+          path: .references/sdk
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Mai-with-u/MaiBot-SnowLuma-Adapter
+          ref: ab751ae5c11f501e0158e33cacc321b33e34ef0c
+          path: .references/adapter
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install locked development dependencies
+        run: |
+          python -m pip install uv==0.12.10
+          uv sync --frozen --group dev
+      - name: Synthetic tests, lint and ZIP construction
+        env:
+          MAIBOT_HOST_SOURCE_ROOT: ${{ github.workspace }}/.references/host
+          MAIBOT_PLUGIN_SDK_PATH: ${{ github.workspace }}/.references/sdk
+          MAIBOT_ADAPTER_SOURCE_ROOT: ${{ github.workspace }}/.references/adapter
+        run: |
+          uv run pytest -q --tb=short
+          uv run ruff check .
+          uv run python build_release.py

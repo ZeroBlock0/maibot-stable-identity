@@ -1,0 +1,317 @@
+{
+  "metadata": {
+    "verification_kind": "offline_source_function_integration",
+    "live_model_called": false,
+    "live_chat_database_used": false,
+    "host_hook_kwargs_replacement_executed": true,
+    "plugin_version": "0.2.5",
+    "host_version": "1.3.15",
+    "host_commit": "062d45cf8bd4272ac57d7ec03fcf405e5a458211",
+    "sdk_version": "2.16.0",
+    "sdk_commit": "835e0e9d1f70ea00885fb49d059f7f2864976d05"
+  },
+  "planner_before": [
+    {
+      "item_type": "SystemMessageItem",
+      "meta": {
+        "item_id": "18df067db65b4b27a3a67eadd2dff124",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.039782"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成人设：自然聊天，保留原有风格。"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:101",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\">\n我在杭州工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:102",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"102\" time=\"12:00:00\" user=\"小明\">\n我在成都工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:103",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"103\" time=\"12:00:00\" user=\"改过的昵称\">\n我还是之前那个人"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "bcac356a26164931ac6e58c37e3bd418",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.039881"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成当前时间提示"
+        }
+      ]
+    }
+  ],
+  "planner_after": [
+    {
+      "item_type": "SystemMessageItem",
+      "meta": {
+        "item_id": "18df067db65b4b27a3a67eadd2dff124",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.039782"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成人设：自然聊天，保留原有风格。"
+        },
+        {
+          "type": "text",
+          "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:101",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:102",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"102\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1002\" identity_person_id=\"7d3126ec329362284fd782463d369985\">\n我在成都工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:103",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"103\" time=\"12:00:00\" user=\"改过的昵称\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我还是之前那个人"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "bcac356a26164931ac6e58c37e3bd418",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.039881"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成当前时间提示"
+        }
+      ]
+    }
+  ],
+  "replyer_before": [
+    {
+      "item_type": "SystemMessageItem",
+      "meta": {
+        "item_id": "b4bab15f07cf41e29667e6d1851c2bdb",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.043099"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成人设：自然聊天，保留原有风格。"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:101",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\">\n我在杭州工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:102",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"102\" time=\"12:00:00\" user=\"小明\">\n我在成都工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:103",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"103\" time=\"12:00:00\" user=\"改过的昵称\">\n我还是之前那个人"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "c2ff7fbd02aa4892a39293fc15c50326",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.043195"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "请自然回复。"
+        }
+      ]
+    }
+  ],
+  "replyer_after": [
+    {
+      "item_type": "SystemMessageItem",
+      "meta": {
+        "item_id": "b4bab15f07cf41e29667e6d1851c2bdb",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.043099"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "合成人设：自然聊天，保留原有风格。"
+        },
+        {
+          "type": "text",
+          "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
+        },
+        {
+          "type": "text",
+          "text": "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
+        },
+        {
+          "type": "text",
+          "text": "[stable_identity.memory:v1] [{\"status\": \"reference_missing\", \"reason\": \"no_verification_reference_in_reply_reference\", \"evidence_status\": \"not_checked\", \"semantic_status\": \"not_evaluated\"}]"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:101",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:102",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"102\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1002\" identity_person_id=\"7d3126ec329362284fd782463d369985\">\n我在成都工作"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "history:103",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-25T12:00:00.123456"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "<message msg_id=\"103\" time=\"12:00:00\" user=\"改过的昵称\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我还是之前那个人"
+        }
+      ]
+    },
+    {
+      "item_type": "UserMessageItem",
+      "meta": {
+        "item_id": "c2ff7fbd02aa4892a39293fc15c50326",
+        "logical_turn_id": null,
+        "timestamp": "2026-10-26T21:22:10.043195"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "请自然回复。"
+        }
+      ]
+    }
+  ]
+}
