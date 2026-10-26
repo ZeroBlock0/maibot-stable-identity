@@ -29,6 +29,13 @@ from stable_identity.plugin import StableIdentityPlugin  # noqa: E402
 STAMP = datetime(2026, 10, 25, 12, 0, 0, 123456).timestamp()
 
 
+@pytest.fixture(autouse=True)
+def synthetic_query_clock(monkeypatch):
+    # Relative seven-day searches must keep covering synthetic messages after
+    # the calendar advances. Monotonic TTL/deadline clocks remain real.
+    monkeypatch.setattr("stable_identity.engine.time.time", lambda: STAMP + 86400)
+
+
 def message(
     mid="101",
     uid="1001",
