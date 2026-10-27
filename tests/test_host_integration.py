@@ -76,7 +76,7 @@ async def build_requests(host):
         reply_message=None,
         reply_reason="合成回复理由",
         selected_expression_ids=[],
-        reply_tool_args={},
+        reply_tool_args={"reply_reference": "合成日常回复方向：自然接话"},
     )
     return {
         "planner_before": SERIALIZE(planner),
@@ -90,8 +90,9 @@ async def test_real_host_request_builders_and_replyer_hook(host):
     requests = await build_requests(host)
     for name in ("planner_after", "replyer_after"):
         text = json.dumps(requests[name], ensure_ascii=False)
-        assert text.count('identity_user_id=\\"1001\\"') == 2
-        assert text.count('identity_user_id=\\"1002\\"') == 1
+        assert text.count('sender_id=\\"qq:1001\\"') == 2
+        assert text.count('sender_id=\\"qq:1002\\"') == 1
+        assert "stable_identity.memory" not in text
     assert "identity_user_id" not in json.dumps(requests["planner_before"])
 
 

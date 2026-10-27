@@ -11,8 +11,8 @@ QQ 客户端事件 user_id
   → Adapter message_info.user_info.user_id
   → 宿主原始消息记录（含平台、机器人账号、路由、会话、原始消息 ID）
   → 插件核验原始记录
-  → 模型外层 identity_platform="qq" identity_user_id="..."
-  → 正式 person.get_id 关联宿主 identity_person_id
+  → 模型外层 sender_id="qq:真实账号"
+  → 正式 person.get_id 关联宿主 person_id（同账号单次请求仅标一次）
 ```
 
 Adapter 的 `codecs/inbound/message_codec.py:QQInboundCodec.build_message_dict` 把真实发送者 ID放进 `user_info.user_id`，同时保留昵称、群名片、原始消息 ID；`runtime/router.py:QQEventRouter.handle_inbound_message` 补上机器人 `account_id` 和连接 `scope`。NapCat 和 SnowLuma 两种客户端都走这条链路。
@@ -52,7 +52,7 @@ Adapter 的 `codecs/inbound/message_codec.py:QQInboundCodec.build_message_dict` 
 
 对话路径已实现逐条原始账号核验和原话查证。但复古历史模板缺少逐条 ID，只能补明确的回复目标；部分压缩追加资料绕过 Hook；Focus 共享请求的新增查证没有唯一会话授权，因此拒绝执行。模型也可能忽略标签，所以不能保证绝不认错。
 
-人物画像方面：已核验消息带有通过正式 `person.get_id(platform, user_id)` 获得的 `identity_person_id`，支持显式 `person_id` 的原生画像工具可使用它。插件没有把旧人物画像或每条旧记忆重新标成某个 QQ 号，也没有强制替换原生昵称解析。
+人物画像方面：已核验消息带有通过正式 `person.get_id(platform, user_id)` 获得的 `person_id`（同账号单次请求仅标一次），支持显式 `person_id` 的原生画像工具可使用它。插件没有把旧人物画像或每条旧记忆重新标成某个 QQ 号，也没有强制替换原生昵称解析。
 
 长期记忆方面，当前源码的两处限制已经核对：
 

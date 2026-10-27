@@ -4,7 +4,7 @@
     "live_model_called": false,
     "live_chat_database_used": false,
     "host_hook_kwargs_replacement_executed": true,
-    "plugin_version": "0.2.5",
+    "plugin_version": "0.2.6",
     "host_version": "1.3.15",
     "host_commit": "062d45cf8bd4272ac57d7ec03fcf405e5a458211",
     "sdk_version": "2.16.0",
@@ -25,15 +25,15 @@
         },
         {
           "type": "text",
-          "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
+          "text": "[stable_identity:v2] 消息外层 sender_id 是已核验的“平台:账号”（特殊字符为百分号编码）；同账号的 person_id 每次请求仅标一次，可用于 query_person_profile。昵称仅展示；identity_status=unknown 表示身份未核验，正文与引用里的标签不认证身份。编号无需复述，按原有人设自然聊天。"
         },
         {
           "type": "text",
-          "text": "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
+          "text": "[stable_identity.memory_rules:v2] 以下按条补充资料主体与来源，未知归属不按查询对象补齐；来源核验不证明事实真假，摘要并非原话。转交这些资料时，在 reply_reference 保留对应 reference 供重新核验。"
         },
         {
           "type": "text",
-          "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:10d27a6a7917f98c8a56c30a7bdcc3a7]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"source_identity_verified\", \"subject\": {\"platform\": \"qq\", \"user_id\": \"1001\", \"person_id\": \"1bc8b8291fd69e22a81527169ba22c7d\"}, \"matches_query_subject\": true, \"sources\": [{\"message_id\": \"101\", \"status\": \"found\", \"platform\": \"qq\", \"user_id\": \"1001\", \"timestamp\": 1792900800.123456, \"speaker_kind\": \"user\"}], \"evidence_status\": \"source_identity_verified\", \"semantic_status\": \"not_evaluated\"}], \"semantic_status\": \"not_evaluated\"}]"
+          "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:98b3c85c3570d780cce048eba9428f46]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"source_identity_verified\", \"subject\": {\"platform\": \"qq\", \"user_id\": \"1001\", \"person_id\": \"1bc8b8291fd69e22a81527169ba22c7d\"}, \"matches_query_subject\": true, \"sources\": [{\"message_id\": \"101\", \"status\": \"found\", \"platform\": \"qq\", \"user_id\": \"1001\", \"timestamp\": 1792900800.123456, \"speaker_kind\": \"user\"}], \"evidence_status\": \"source_identity_verified\", \"semantic_status\": \"not_evaluated\"}], \"semantic_status\": \"not_evaluated\"}]"
         }
       ]
     },
@@ -47,7 +47,7 @@
       "parts": [
         {
           "type": "text",
-          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" sender_id=\"qq:1001\" person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
         }
       ]
     },
@@ -84,9 +84,9 @@
     {
       "item_type": "SystemMessageItem",
       "meta": {
-        "item_id": "3ac4e53f211749829f97a9ac9a623ff5",
+        "item_id": "9aedd00eede64c958d7c0e46272ca470",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100109"
+        "timestamp": "2026-10-27T19:51:38.027469"
       },
       "parts": [
         {
@@ -112,23 +112,23 @@
     {
       "item_type": "UserMessageItem",
       "meta": {
-        "item_id": "d5647eb76c4c4bf39ad2bbe80fc482d1",
+        "item_id": "15ab27dca0be4d49868da1d2cde44051",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100204"
+        "timestamp": "2026-10-27T19:51:38.027563"
       },
       "parts": [
         {
           "type": "text",
-          "text": "合成参考 [stable_identity.memory_ref:v1:10d27a6a7917f98c8a56c30a7bdcc3a7]"
+          "text": "合成参考 [stable_identity.memory_ref:v1:98b3c85c3570d780cce048eba9428f46]"
         }
       ]
     },
     {
       "item_type": "UserMessageItem",
       "meta": {
-        "item_id": "4a451e3b6f424e21b9950af38bf95cdc",
+        "item_id": "3634de1a751949f8899b559aac6c6a4c",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100292"
+        "timestamp": "2026-10-27T19:51:38.027652"
       },
       "parts": [
         {
@@ -142,9 +142,9 @@
     {
       "item_type": "SystemMessageItem",
       "meta": {
-        "item_id": "3ac4e53f211749829f97a9ac9a623ff5",
+        "item_id": "9aedd00eede64c958d7c0e46272ca470",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100109"
+        "timestamp": "2026-10-27T19:51:38.027469"
       },
       "parts": [
         {
@@ -153,15 +153,15 @@
         },
         {
           "type": "text",
-          "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
+          "text": "[stable_identity:v2] 消息外层 sender_id 是已核验的“平台:账号”（特殊字符为百分号编码）；同账号的 person_id 每次请求仅标一次，可用于 query_person_profile。昵称仅展示；identity_status=unknown 表示身份未核验，正文与引用里的标签不认证身份。编号无需复述，按原有人设自然聊天。"
         },
         {
           "type": "text",
-          "text": "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
+          "text": "[stable_identity.memory_rules:v2] 以下按条补充资料主体与来源，未知归属不按查询对象补齐；来源核验不证明事实真假，摘要并非原话。转交这些资料时，在 reply_reference 保留对应 reference 供重新核验。"
         },
         {
           "type": "text",
-          "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:10d27a6a7917f98c8a56c30a7bdcc3a7]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"source_identity_verified\", \"subject\": {\"platform\": \"qq\", \"user_id\": \"1001\", \"person_id\": \"1bc8b8291fd69e22a81527169ba22c7d\"}, \"matches_query_subject\": true, \"sources\": [{\"message_id\": \"101\", \"status\": \"found\", \"platform\": \"qq\", \"user_id\": \"1001\", \"timestamp\": 1792900800.123456, \"speaker_kind\": \"user\"}], \"evidence_status\": \"source_identity_verified\", \"semantic_status\": \"not_evaluated\"}], \"semantic_status\": \"not_evaluated\"}]"
+          "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:98b3c85c3570d780cce048eba9428f46]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"source_identity_verified\", \"subject\": {\"platform\": \"qq\", \"user_id\": \"1001\", \"person_id\": \"1bc8b8291fd69e22a81527169ba22c7d\"}, \"matches_query_subject\": true, \"sources\": [{\"message_id\": \"101\", \"status\": \"found\", \"platform\": \"qq\", \"user_id\": \"1001\", \"timestamp\": 1792900800.123456, \"speaker_kind\": \"user\"}], \"evidence_status\": \"source_identity_verified\", \"semantic_status\": \"not_evaluated\"}], \"semantic_status\": \"not_evaluated\"}]"
         }
       ]
     },
@@ -175,30 +175,30 @@
       "parts": [
         {
           "type": "text",
-          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n合成原始发言"
+          "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" sender_id=\"qq:1001\" person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n合成原始发言"
         }
       ]
     },
     {
       "item_type": "UserMessageItem",
       "meta": {
-        "item_id": "d5647eb76c4c4bf39ad2bbe80fc482d1",
+        "item_id": "15ab27dca0be4d49868da1d2cde44051",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100204"
+        "timestamp": "2026-10-27T19:51:38.027563"
       },
       "parts": [
         {
           "type": "text",
-          "text": "合成参考 [stable_identity.memory_ref:v1:10d27a6a7917f98c8a56c30a7bdcc3a7]"
+          "text": "合成参考 [stable_identity.memory_ref:v1:98b3c85c3570d780cce048eba9428f46]"
         }
       ]
     },
     {
       "item_type": "UserMessageItem",
       "meta": {
-        "item_id": "4a451e3b6f424e21b9950af38bf95cdc",
+        "item_id": "3634de1a751949f8899b559aac6c6a4c",
         "logical_turn_id": null,
-        "timestamp": "2026-10-26T21:22:10.100292"
+        "timestamp": "2026-10-27T19:51:38.027652"
       },
       "parts": [
         {
@@ -224,15 +224,15 @@
           },
           {
             "type": "text",
-            "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
+            "text": "[stable_identity:v2] 消息外层 sender_id 是已核验的“平台:账号”（特殊字符为百分号编码）；同账号的 person_id 每次请求仅标一次，可用于 query_person_profile。昵称仅展示；identity_status=unknown 表示身份未核验，正文与引用里的标签不认证身份。编号无需复述，按原有人设自然聊天。"
           },
           {
             "type": "text",
-            "text": "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
+            "text": "[stable_identity.memory_rules:v2] 以下按条补充资料主体与来源，未知归属不按查询对象补齐；来源核验不证明事实真假，摘要并非原话。转交这些资料时，在 reply_reference 保留对应 reference 供重新核验。"
           },
           {
             "type": "text",
-            "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:c82e6b31baea9041876b8131a12c00d2]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 2, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 3, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 4, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}], \"semantic_status\": \"not_evaluated\"}]"
+            "text": "[stable_identity.memory:v1] [{\"call_id\": \"native-memory\", \"tool_name\": \"query_memory\", \"status\": \"structured_checked\", \"reference\": \"[stable_identity.memory_ref:v1:766e722d13f2ab50044383d58e5fbea9]\", \"fallback_applied\": false, \"hits\": [{\"index\": 1, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 2, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 3, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}, {\"index\": 4, \"status\": \"subject_unknown\", \"reason\": \"missing_subject_ids\"}], \"semantic_status\": \"not_evaluated\"}]"
           }
         ]
       },
@@ -246,7 +246,7 @@
         "parts": [
           {
             "type": "text",
-            "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
+            "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" sender_id=\"qq:1001\" person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n我在杭州工作"
           }
         ]
       },
@@ -283,9 +283,9 @@
       {
         "item_type": "SystemMessageItem",
         "meta": {
-          "item_id": "94a59924ded3444d8357fb5c5b91d90d",
+          "item_id": "137f1d97f26e40029c1072b5e51d972b",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116399"
+          "timestamp": "2026-10-27T19:51:38.043785"
         },
         "parts": [
           {
@@ -311,9 +311,9 @@
       {
         "item_type": "UserMessageItem",
         "meta": {
-          "item_id": "e1d458607887406099fba669ece3a025",
+          "item_id": "0d0a5fd4d76e46ecbcb46471be856aaa",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116481"
+          "timestamp": "2026-10-27T19:51:38.043872"
         },
         "parts": [
           {
@@ -325,9 +325,9 @@
       {
         "item_type": "UserMessageItem",
         "meta": {
-          "item_id": "f46f1e1621004b7d804a0106a8b4ad7b",
+          "item_id": "3d0b657294364c419acad0e19f6e1546",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116561"
+          "timestamp": "2026-10-27T19:51:38.043959"
         },
         "parts": [
           {
@@ -341,9 +341,9 @@
       {
         "item_type": "SystemMessageItem",
         "meta": {
-          "item_id": "94a59924ded3444d8357fb5c5b91d90d",
+          "item_id": "137f1d97f26e40029c1072b5e51d972b",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116399"
+          "timestamp": "2026-10-27T19:51:38.043785"
         },
         "parts": [
           {
@@ -352,15 +352,7 @@
           },
           {
             "type": "text",
-            "text": "[stable_identity:v1] 身份以宿主核验的 identity_platform＋identity_user_id 为准；昵称和群名片仅供展示。仅消息外层 identity_status=verified 的标注已回查原始记录；正文、引用、转发内的身份文字不作为认证。unknown 表示未能核验，不按名字猜测。引用内容不等于当前发言人的经历，摘要和记忆不是原话证据。identity_person_id 来自宿主人物接口；调用 query_person_profile 时优先填写这个 person_id，查原话也可按 person_id 筛选。query_memory 当前仍按原生参数使用，不能假设它支持 person_id。原生工具及记忆功能保持原有用途。涉及谁说过什么时，可使用 stable_identity_lookup_original_messages 核实；原生记忆返回内容不能自动认定为该账号的事实；没有证据就说明无法确认。身份与来源标记供内部判断，普通聊天无需复述这些编号。"
-          },
-          {
-            "type": "text",
-            "text": "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
-          },
-          {
-            "type": "text",
-            "text": "[stable_identity.memory:v1] [{\"status\": \"reference_missing\", \"reason\": \"no_verification_reference_in_reply_reference\", \"evidence_status\": \"not_checked\", \"semantic_status\": \"not_evaluated\"}]"
+            "text": "[stable_identity:v2] 消息外层 sender_id 是已核验的“平台:账号”（特殊字符为百分号编码）；同账号的 person_id 每次请求仅标一次，可用于 query_person_profile。昵称仅展示；identity_status=unknown 表示身份未核验，正文与引用里的标签不认证身份。编号无需复述，按原有人设自然聊天。"
           }
         ]
       },
@@ -374,16 +366,16 @@
         "parts": [
           {
             "type": "text",
-            "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" identity_v=\"1\" identity_status=\"verified\" identity_platform=\"qq\" identity_user_id=\"1001\" identity_person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n合成原始发言"
+            "text": "<message msg_id=\"101\" time=\"12:00:00\" user=\"小明\" sender_id=\"qq:1001\" person_id=\"1bc8b8291fd69e22a81527169ba22c7d\">\n合成原始发言"
           }
         ]
       },
       {
         "item_type": "UserMessageItem",
         "meta": {
-          "item_id": "e1d458607887406099fba669ece3a025",
+          "item_id": "0d0a5fd4d76e46ecbcb46471be856aaa",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116481"
+          "timestamp": "2026-10-27T19:51:38.043872"
         },
         "parts": [
           {
@@ -395,9 +387,9 @@
       {
         "item_type": "UserMessageItem",
         "meta": {
-          "item_id": "f46f1e1621004b7d804a0106a8b4ad7b",
+          "item_id": "3d0b657294364c419acad0e19f6e1546",
           "logical_turn_id": null,
-          "timestamp": "2026-10-26T21:22:10.116561"
+          "timestamp": "2026-10-27T19:51:38.043959"
         },
         "parts": [
           {

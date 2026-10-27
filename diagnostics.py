@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List
 import json
 import time
 
-from .engine import parse_header
+from .engine import ATTR_RE, parse_header
 
 
 class ActivityReporter:
@@ -68,6 +68,7 @@ class ActivityReporter:
             "target_verified": 0,
             "target_unknown": 0,
         }
+        linked_senders = set()
         for item in items:
             parts = item.get("parts", [])
             if item.get("item_type") == "UserMessageItem" and parts and parts[0].get("type") == "text":
@@ -75,9 +76,12 @@ class ActivityReporter:
                 if parsed is not None:
                     prefix = parts[0]["text"][: parsed[1]]
                     counts["messages"] += 1
-                    key = "verified" if 'identity_status="verified"' in prefix else "unknown"
+                    attrs = dict(ATTR_RE.findall(prefix))
+                    key = "verified" if attrs.get("sender_id") else "unknown"
                     counts[key] += 1
-                    counts["person_linked"] += int('identity_person_id="' in prefix)
+                    if attrs.get("person_id"):
+                        linked_senders.add(attrs["sender_id"])
+                    counts["person_linked"] += int(attrs.get("sender_id") in linked_senders)
             if item.get("item_type") == "SystemMessageItem":
                 for part in parts:
                     text = part.get("text", "")
@@ -162,8 +166,15 @@ class ActivityReporter:
     def memory(self, stage: str, counts: Dict[str, int]) -> None:
         if not counts:
             return
-        # Replies can legitimately use no memory at all. An absent link is an
-        # explicit unverified state, not evidence of a failed native tool.
+        # Native ordinary replies also carry reference text. Keep missing-link
+        # diagnostics distinct from an actual memory verification result.
+        if counts == {"reference_missing": 1}:
+            if self.due("memory_" + stage, "reference_missing"):
+                self.logger.info(
+                    "身份增强 %s 记忆引用诊断: reference_missing（仅日志，不追加模型提示）；不代表原生记忆失败",
+                    stage,
+                )
+            return
         known = {"structured_checked", "source_identity_verified", "profile_subject_mapped", "reference_missing"}
         incomplete = any(key not in known for key in counts)
         if self.due("memory_" + stage, "incomplete" if incomplete else "normal"):

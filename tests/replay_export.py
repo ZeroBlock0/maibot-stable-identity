@@ -142,10 +142,12 @@ async def replay(connection):
                     actual = [i for i in result.kwargs["items"] if i["item_type"] == "UserMessageItem"]
                     for (message, before), after in zip(batch, actual, strict=True):
                         header = after["parts"][0]["text"].splitlines()[0]
-                        verified = 'identity_status="verified"' in header
+                        verified = 'sender_id="' in header
                         counts["verified" if verified else "unknown"] += 1
                         if verified:
-                            assert f'identity_user_id="{message["message_info"]["user_info"]["user_id"]}"' in header
+                            from stable_identity.engine import sender_key
+                            expected = sender_key(message["platform"], message["message_info"]["user_info"]["user_id"])
+                            assert f'sender_id="{expected}"' in header
                         assert before["parts"][0]["text"].split(">", 1)[1] == after["parts"][0]["text"].split(">", 1)[1]
                     counts["protocol_accepted_batches"] += 1
             report["stages"][stage] = dict(counts)

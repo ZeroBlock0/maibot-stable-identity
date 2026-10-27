@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "id": "local.stable-identity",
   "name": "稳定身份与原话查证",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "按平台和真实用户 ID 标注可核验聊天消息，并提供限定会话的原始发言查证。",
   "author": {
     "name": "Zero",

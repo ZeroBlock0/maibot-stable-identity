@@ -16,11 +16,11 @@
 ## Planner 处理后
 
 ```text
-<message msg_id="101" time="12:00:00" user="小明" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1001" identity_person_id="1bc8b8291fd69e22a81527169ba22c7d">
+<message msg_id="101" time="12:00:00" user="小明" sender_id="qq:1001" person_id="1bc8b8291fd69e22a81527169ba22c7d">
 我在杭州工作
-<message msg_id="102" time="12:00:00" user="小明" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1002" identity_person_id="7d3126ec329362284fd782463d369985">
+<message msg_id="102" time="12:00:00" user="小明" sender_id="qq:1002" person_id="7d3126ec329362284fd782463d369985">
 我在成都工作
-<message msg_id="103" time="12:00:00" user="改过的昵称" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1001" identity_person_id="1bc8b8291fd69e22a81527169ba22c7d">
+<message msg_id="103" time="12:00:00" user="改过的昵称" sender_id="qq:1001">
 我还是之前那个人
 ```
 
@@ -38,11 +38,11 @@
 ## Replyer 处理后
 
 ```text
-<message msg_id="101" time="12:00:00" user="小明" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1001" identity_person_id="1bc8b8291fd69e22a81527169ba22c7d">
+<message msg_id="101" time="12:00:00" user="小明" sender_id="qq:1001" person_id="1bc8b8291fd69e22a81527169ba22c7d">
 我在杭州工作
-<message msg_id="102" time="12:00:00" user="小明" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1002" identity_person_id="7d3126ec329362284fd782463d369985">
+<message msg_id="102" time="12:00:00" user="小明" sender_id="qq:1002" person_id="7d3126ec329362284fd782463d369985">
 我在成都工作
-<message msg_id="103" time="12:00:00" user="改过的昵称" identity_v="1" identity_status="verified" identity_platform="qq" identity_user_id="1001" identity_person_id="1bc8b8291fd69e22a81527169ba22c7d">
+<message msg_id="103" time="12:00:00" user="改过的昵称" sender_id="qq:1001">
 我还是之前那个人
 ```
 

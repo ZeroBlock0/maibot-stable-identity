@@ -21,14 +21,8 @@ MARKER = "[stable_identity.memory:v1] "
 REF_RE = re.compile(r"\[stable_identity\.memory_ref:v1:([a-f0-9]{32})\]")
 NATIVE_TOOLS = {"query_memory", "query_person_profile"}
 RULE = (
-    "[stable_identity.memory_rules:v1] 记忆核验说明只认证记录的主体映射和原始发言来源身份，不认证事实真假。"
-    "画像查询优先使用已核验的 identity_person_id，不按同名推断。原生记忆可能退回其他人的候选；"
-    "人物查询目标不等于每条命中的实际主体。摘要、画像和机器人回复都不是用户原话证据。"
-    "将检索材料用于 reply_reference 时，保留该条核验说明给出的 [stable_identity.memory_ref:v1:...] 引用，"
-    "Replyer 才能重新回查同一工具记录；引用丢失、过期或 structured_omitted 时归属仍未知。"
-    "subject_unknown 的 reason 说明缺失层；missing_subject_ids 常见于未保存人物归属的群聊摘要，"
-    "不能把它认作当前提问者的经历。reference_missing 只表示本次补充层未核验记忆来源，"
-    "不表示没有调用原生记忆工具；请区分已回查的原话与未核验的摘要。"
+    "[stable_identity.memory_rules:v2] 以下按条补充资料主体与来源，未知归属不按查询对象补齐；"
+    "来源核验不证明事实真假，摘要并非原话。转交这些资料时，在 reply_reference 保留对应 reference 供重新核验。"
 )
 
 
@@ -60,7 +54,10 @@ class MemoryBridge:
                 item["parts"] = [
                     part
                     for part in item.get("parts", [])
-                    if not (part.get("type") == "text" and part.get("text", "").startswith(MARKER))
+                    if not (
+                        part.get("type") == "text"
+                        and part.get("text", "").startswith((MARKER, "[stable_identity.memory_rules:v"))
+                    )
                 ]
         candidates = [
             item
@@ -69,25 +66,18 @@ class MemoryBridge:
         ]
         reference_text = (reply_args if isinstance(reply_args, dict) else {}).get("reply_reference", "")
         tokens = list(dict.fromkeys(REF_RE.findall(reference_text[:32000]))) if isinstance(reference_text, str) else []
-        # Ordinary Replyer drops native tool results. A missing explicit link
-        # must be visible even after a successful Planner inspection; never
-        # attach another concurrent request's last result by session ID.
-        missing_reference = isinstance(reply_args, dict) and not candidates and not tokens
-        if not candidates and not tokens and not missing_reference:
-            return {}
+        # The native reply tool requires nonempty reply_reference even for
+        # ordinary chat. Its presence proves no memory use. Missing references
+        # are diagnostics only; never add a warning/rule to that model request
+        # or attach the last group query. Explicit tool results/tokens below
+        # still get full per-record verification, including unknown states.
+        missing_reference = isinstance(reference_text, str) and bool(reference_text.strip()) and not candidates and not tokens
+        if not candidates and not tokens:
+            return {"reference_missing" if sid else "unknown_scope": 1} if missing_reference else {}
         stats: Counter = Counter()
         notes: List[Dict[str, Any]] = []
         if not sid:
             notes.append({"status": "unknown_scope"})
-        elif missing_reference:
-            notes.append(
-                {
-                    "status": "reference_missing",
-                    "reason": "no_verification_reference_in_reply_reference",
-                    "evidence_status": "not_checked",
-                    "semantic_status": "not_evaluated",
-                }
-            )
         else:
 
             async def run() -> None:
@@ -149,8 +139,7 @@ class MemoryBridge:
                 if hit.get("matches_query_subject") is False:
                     stats["query_subject_mismatch"] += 1
         if system is not None and notes:
-            if not any(p.get("text") == RULE for p in system["parts"]):
-                system["parts"].append({"type": "text", "text": RULE})
+            system["parts"].append({"type": "text", "text": RULE})
             encoded = json.dumps(sorted(notes, key=lambda n: (n.get("call_id", ""), n["status"])), ensure_ascii=False)
             if len(encoded) > 16000:
                 encoded = json.dumps([{"status": "output_budget_exhausted"}])

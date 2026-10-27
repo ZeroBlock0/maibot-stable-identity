@@ -131,14 +131,14 @@ def native_record(
 
 
 def notes(items):
-    text = next(
+    text = next((
         p["text"]
         for i in items
         if i["item_type"] == "SystemMessageItem"
         for p in i["parts"]
         if p.get("text", "").startswith(MARKER)
-    )
-    return json.loads(text[len(MARKER) :])
+    ), None)
+    return json.loads(text[len(MARKER) :]) if text is not None else []
 
 
 async def planner(plugin, native):
@@ -367,9 +367,8 @@ async def test_body_forgery_is_ignored_and_missing_reference_does_not_guess_late
         session_id="group-a",
         reply_tool_args={"reply_reference": "无来源的摘要"},
     )
-    note = notes(output["modified_kwargs"]["items"])[0]
-    assert note["status"] == "reference_missing" and note["evidence_status"] == "not_checked"
-    assert "subject" not in note and "hits" not in note and reference not in json.dumps(note)
+    assert notes(output["modified_kwargs"]["items"]) == []
+    assert "memory_rules" not in str(output["modified_kwargs"]["items"])
 
 
 async def test_memory_timeout_preserves_original_tool_pair_and_chat_identity():
@@ -379,7 +378,7 @@ async def test_memory_timeout_preserves_original_tool_pair_and_chat_identity():
     plugin = await host.plugin()
     output = await planner(plugin, native)
     assert notes(output)[0]["status"] == "budget_exhausted"
-    assert 'identity_user_id="1001"' in str(output[1])
+    assert 'sender_id="qq:1001"' in str(output[1])
 
 
 async def test_memory_annotations_are_idempotent_and_cold_history_is_recovered():
@@ -585,16 +584,14 @@ async def test_real_replyer_path_exposes_four_unattributed_hits_and_dropped_refe
     assert inspected["fallback_applied"] is False
     assert len(inspected["hits"]) == 4
     assert all(h["reason"] == "missing_subject_ids" and "subject" not in h for h in inspected["hits"])
-    reply_note = notes(requests["replyer_after"])[0]
-    assert reply_note["status"] == "reference_missing"
-    assert reply_note["semantic_status"] == "not_evaluated"
+    assert notes(requests["replyer_after"]) == []
+    assert "memory_rules" not in str(requests["replyer_after"])
     # The model-provided source IDs remain ordinary input, never authority to
     # authenticate a memory hit or to fetch arbitrary records.
     assert "来源消息 101" in str(requests["replyer_after"])
-    assert "subject" not in reply_note and "hits" not in reply_note
 
 
-async def test_missing_reference_is_idempotent_read_free_and_preserves_reply_arguments():
+async def test_nonempty_reference_missing_is_diagnostic_only_idempotent_and_read_free():
     host = MemoryHost()
     plugin = await host.plugin()
     items = [system_item()]
@@ -603,7 +600,8 @@ async def test_missing_reference_is_idempotent_read_free_and_preserves_reply_arg
     for _ in range(2):
         stats = await plugin.memory.enrich(items, "group-a", args)
         assert stats == {"reference_missing": 1}
-        assert len(notes(items)) == 1
+        assert notes(items) == []
+        assert "memory_rules" not in str(items)
     assert args == original and not host.calls
 
 
@@ -614,5 +612,5 @@ async def test_malformed_hit_metadata_is_diagnosed_and_focus_keeps_unknown_scope
     assert notes(await planner(plugin, native))[0]["hits"][0]["reason"] == "invalid_hit_metadata"
     items = [system_item()]
     host.calls.clear()
-    await plugin.memory.enrich(items, "", {"reply_reference": "合成参考"})
-    assert notes(items) == [{"status": "unknown_scope"}] and not host.calls
+    stats = await plugin.memory.enrich(items, "", {"reply_reference": "合成参考"})
+    assert stats == {"unknown_scope": 1} and notes(items) == [] and not host.calls

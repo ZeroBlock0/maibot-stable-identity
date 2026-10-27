@@ -69,7 +69,7 @@ async def test_complete_hook_envelope_preserves_schema_and_other_plugin_paramete
     )
     assert restored
     if stage != "Planner输出":
-        assert 'identity_user_id="1001"' in str(dispatched.kwargs["items"])
+        assert 'sender_id="qq:1001"' in str(dispatched.kwargs["items"])
 
 
 async def test_info_activity_reaches_real_runner_ipc_log_handler_without_private_text(host):

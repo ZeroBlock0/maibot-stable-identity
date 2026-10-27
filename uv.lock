@@ -80,7 +80,7 @@ wheels = [
 
 [[package]]
 name = "maibot-stable-identity"
-version = "0.2.5"
+version = "0.2.6"
 source = { virtual = "." }
 dependencies = [
     { name = "maibot-plugin-sdk" },

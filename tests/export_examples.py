@@ -96,6 +96,8 @@ async def main():
         )
     memory_sections.extend(
         [
+            "0.2.6 的漏传引用场景中 Replyer 输出 []，表示没有向模型追加记忆核验文本；reference_missing 仅作日志诊断。原生参考未改写，也没有据此认证人物归属。",
+            "",
             "完整 Context Items 见 `memory_requests.synthetic.json`；不开结构化工具记录时返回 structured_omitted，不能得到这里的完整来源。",
             "",
         ]

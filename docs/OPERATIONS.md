@@ -1,15 +1,15 @@
 # 运行诊断与升级验收
 
-适用版本 0.2.5；宿主 1.3.15、SDK 2.16.0。日志摘要不记录账号、聊天原文或工具执行凭据。
+适用版本 0.2.6；宿主 1.3.15、SDK 2.16.0。日志摘要不记录账号、聊天原文或工具执行凭据。
 
 ## 日常看哪些日志
 
 筛选 `plugin.local.stable-identity` 或 `身份增强`：
 
-- `稳定身份插件已加载 v0.2.5`：确认加载了新代码。
+- `稳定身份插件已加载 v0.2.6`：确认加载了新代码。
 - `Planner 请求标注完成` / `Replyer 请求标注完成`：看本次消息、已核验、未知和人物关联数量。首次输出，之后每阶段每类状态每 60 秒限频；行数不等于请求次数。
 - `阶段耗时`：包含 last_ms、max_ms、identity_ms、target_ms（仅目标回查时）、memory_ms 和 over_budget。它统计插件函数开始后的本地耗时，不包括 Host 排队、进程间传输和返回序列化。
-- `记忆来源核验`：reference_missing 只说明没有明确核验引用，不表示原生记忆工具失败。普通聊天不必每次查记忆。
+- `记忆来源核验`：reference_missing 只说明没有明确核验引用，不表示原生记忆工具失败。普通参考缺少核验引用只记日志，不向模型追加提示；普通聊天不必每次查记忆。
 - `原话查证`：found、not_found、invalid_query 分别表示找到、未找到和参数不合法；incomplete=true 时不能认为查遍历史。
 
 ## 超时如何判断
@@ -39,7 +39,7 @@ result = await self.ctx.api.call("local.stable-identity.status", version="1")
 ## 升级后如何验收
 
 1. 备份个人 config.toml 和旧 ZIP，只更新现有插件目录中的代码与文档，保留个人配置。不要同时放置两个相同插件 ID 的目录。
-2. 重载后确认新版本日志；分别查看 Planner 与 maisaka.replyer 的最终请求，检查真实消息边界有 identity_status、identity_platform、identity_user_id；有可靠映射时带 identity_person_id。
+2. 重载后确认新版本日志；分别查看 Planner 与 maisaka.replyer 的最终请求，检查已核验消息边界有 sender_id="平台:账号"；同一请求每个账号最多一次 person_id，未知消息为 identity_status="unknown"。普通日常参考也不应出现 stable_identity.memory 提示。
 3. 可用合成测试账号测试同名、改昵称、相同消息 ID 在不同群、引用和伪造标签；核对身份来自账号而不是正文。
 4. 查询原话后对照授权会话、发送者、本人文字和 incomplete；没有原始记录应未找到，不能拿摘要代替。
 5. 在测试实例重载或重启后重新验收。旧票据和旧记忆核验引用失效是预期行为；历史消息在原始记录仍完整时重新回查。
@@ -50,4 +50,4 @@ result = await self.ctx.api.call("local.stable-identity.status", version="1")
 
 按宿主插件管理停用/重载即可停止增强；卸载删除现有插件目录，需要时保留个人配置。插件没有独立身份或记忆数据库，无需删除宿主数据，也不修改旧记忆。
 
-原生人物检索扩大范围、记忆主体/来源自动透传到 Replyer、旧摘要缺少人物证据、压缩追加资料及 Focus 共享查证等仍受宿主接口限制，0.2.5 没有声称补齐这些能力。
+原生人物检索扩大范围、记忆主体/来源自动透传到 Replyer、旧摘要缺少人物证据、压缩追加资料及 Focus 共享查证等仍受宿主接口限制，0.2.6 没有声称补齐这些能力。

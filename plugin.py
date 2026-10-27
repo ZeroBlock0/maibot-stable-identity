@@ -13,7 +13,7 @@ from .engine import IdentityEngine, SCHEMA_VERSION, Settings, TOOL_NAME
 from .memory_bridge import MemoryBridge
 
 
-VERSION = "0.2.5"
+VERSION = "0.2.6"
 REQUEST_BUDGET_SECONDS = 4.0
 
 
@@ -94,7 +94,7 @@ class StableIdentityPlugin(MaiBotPlugin):
         self.diagnostics = ActivityReporter(self.ctx.logger)
         self.memory = MemoryBridge(self.engine)
         self.ctx.logger.info(
-            "稳定身份插件已加载 v0.2.5；请求增强共用4秒预算；支持只读status及阶段耗时诊断。INFO摘要每阶段首次及每60秒记录。复古/压缩部分支持，Focus共享查证拒绝执行。"
+            "稳定身份插件已加载 v0.2.6；请求增强共用4秒预算；支持只读status及阶段耗时诊断。INFO摘要每阶段首次及每60秒记录。复古/压缩部分支持，Focus共享查证拒绝执行。"
         )
 
     async def on_unload(self) -> None:

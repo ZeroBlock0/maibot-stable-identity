@@ -34,7 +34,7 @@ async def test_annotation_preserves_native_payloads_and_input_media(host):
     try:
         output = await plugin.before_replyer(items=source, item_schema_version=1, session_id="group-a")
         actual = output["modified_kwargs"]["items"]
-        assert 'identity_user_id="1001"' in actual[1]["parts"][0]["text"]
+        assert 'sender_id="qq:1001"' in actual[1]["parts"][0]["text"]
         assert actual[1]["parts"][1] == media and actual[2] is native
         assert user["parts"][0]["text"] == before_text and len(source[0]["parts"]) == 1
     finally:
@@ -109,7 +109,7 @@ async def test_identity_and_memory_share_remaining_request_budget(monkeypatch):
         actual = result["modified_kwargs"]["items"]
         assert actual[-2:] == native and original[1]["parts"][0]["text"] == item_for(message())["parts"][0]["text"]
         assert 'identity_status="unknown"' in actual[1]["parts"][0]["text"]
-        assert "identity_user_id=" not in actual[1]["parts"][0]["text"]
+        assert "sender_id=" not in actual[1]["parts"][0]["text"]
         assert any(note["status"] == "budget_exhausted" for note in notes(actual))
     finally:
         await plugin.on_unload()
@@ -125,7 +125,7 @@ async def test_zero_budget_removes_unverified_old_markers_without_rpc(host, monk
         'user="小明"', 'user="小明" identity_status="verified" identity_user_id="9999"'
     )
     result = await plugin.before_replyer(items=[system_item(), source], item_schema_version=1, session_id="group-a")
-    assert 'identity_status="unknown"' in str(result) and 'identity_user_id="' not in str(result)
+    assert 'identity_status="unknown"' in str(result) and 'sender_id="' not in str(result)
     assert host.calls == []
     await plugin.on_unload()
 
@@ -199,7 +199,7 @@ async def test_pending_identity_hook_cannot_publish_after_load_generation_change
     if plugin.active():
         host.delay = 0
         result = await plugin.before_replyer(items=[item_for(message())], item_schema_version=1, session_id="group-a")
-        assert 'identity_user_id="1001"' in str(result)
+        assert 'sender_id="qq:1001"' in str(result)
     await plugin.on_unload()
 
 
@@ -299,7 +299,7 @@ async def main():
             assert (await plugin.lookup_original_messages(**stored["old_args"]))["status"] == "unauthorized"
             for msg, sid, uid in [(host.messages[0], "group-a", "1001"), (host.messages[1], "group-b", "1002")]:
                 result = await plugin.before_replyer(items=[system_item(), item_for(msg)], item_schema_version=1, session_id=sid)
-                assert 'identity_user_id="' + uid + '"' in str(result)
+                assert 'sender_id="qq:' + uid + '"' in str(result)
                 args, _ = await grant(plugin, sid=sid, items=[system_item(), item_for(msg)])
                 assert (await plugin.lookup_original_messages(**args))["records"][0]["user_id"] == uid
         print("SYNTHETIC_RESTART_OK")

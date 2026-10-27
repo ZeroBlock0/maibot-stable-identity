@@ -31,6 +31,7 @@ FILES = (
     "docs/MEMORY_BRIDGE.md",
     "docs/MEMORY_REQUEST_EXAMPLES.md",
     "docs/memory_requests.synthetic.json",
+    "docs/PROMPT_FOOTPRINT.md",
 )
 
 

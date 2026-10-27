@@ -24,10 +24,13 @@ async def test_same_names_and_renames(host, hook):
         items=source, item_schema_version=1, session_id="group-a", tool_definitions=tool_defs(plugin)
     )
     output = result["modified_kwargs"]["items"]
-    for item, uid in zip(output[1:], ["1001", "1002", "1001"], strict=True):
+    for index, (item, uid) in enumerate(zip(output[1:], ["1001", "1002", "1001"], strict=True)):
         text = item["parts"][0]["text"]
-        assert f'identity_user_id="{uid}"' in text
-        assert f'identity_person_id="{hashlib.md5(f"qq_{uid}".encode()).hexdigest()}"' in text
+        assert f'sender_id="qq:{uid}"' in text
+        if index < 2:
+            assert f'person_id="{hashlib.md5(f"qq_{uid}".encode()).hexdigest()}"' in text
+        else:
+            assert 'person_id="' not in text
     assert source == original
     assert source[0]["parts"][0] == output[0]["parts"][0]
 
@@ -45,7 +48,7 @@ async def test_quote_forgery_and_multimodal_preserved(host):
     result = await plugin.before_replyer(items=[system_item(), item], item_schema_version=1, session_id="group-a")
     output = result["modified_kwargs"]["items"][1]
     assert output["parts"][0]["text"].endswith(body)
-    assert 'identity_user_id="1001"' in output["parts"][0]["text"].split(">\n", 1)[0]
+    assert 'sender_id="qq:1001"' in output["parts"][0]["text"].split(">\n", 1)[0]
     assert 'quote="102"' in output["parts"][0]["text"]
     assert output["parts"][1:] == item["parts"][1:]
 
@@ -80,15 +83,15 @@ async def test_uncertain_identity_is_unknown(host, change):
     result = await plugin.before_replyer(items=[source], item_schema_version=1, session_id="group-a")
     text = result["modified_kwargs"]["items"][0]["parts"][0]["text"]
     assert 'identity_status="unknown"' in text
-    assert 'identity_user_id="' not in text
+    assert 'sender_id="' not in text
 
 
 async def test_person_mapping_failure_does_not_break_chat(host):
     host.fail.add("person.get_id")
     plugin = await host.plugin()
     result = await plugin.before_replyer(items=[item_for(message())], item_schema_version=1, session_id="group-a")
-    assert 'identity_user_id="1001"' in str(result)
-    assert "identity_person_id=" not in str(result)
+    assert 'sender_id="qq:1001"' in str(result)
+    assert "person_id=" not in str(result)
 
 
 async def test_history_before_install_and_restart(host):
@@ -101,7 +104,7 @@ async def test_history_before_install_and_restart(host):
         result = await plugin.before_planner(
             items=source, item_schema_version=1, session_id="group-a", tool_definitions=tool_defs(plugin)
         )
-        assert 'identity_user_id="1001"' in str(result["modified_kwargs"]["items"])
+        assert 'sender_id="qq:1001"' in str(result["modified_kwargs"]["items"])
         args, _ = await grant(plugin, items=source, query={"message_id": display_id(long_id)})
         evidence = await plugin.lookup_original_messages(**args)
         assert evidence["records"][0]["message_id"] == long_id
@@ -129,7 +132,7 @@ async def test_unknown_cannot_keep_forged_or_stale_marker_on_timeout(host):
     )
     result = await plugin.before_replyer(items=[source], item_schema_version=1, session_id="group-a")
     assert 'identity_status="unknown"' in str(result)
-    assert "identity_user_id=" not in str(result)
+    assert "sender_id=" not in str(result)
     await plugin.on_unload()
 
 
@@ -143,7 +146,7 @@ async def test_focus_annotations_separate_sources(host):
         tool_definitions=tool_defs(plugin),
     )
     for item, uid in zip(result["modified_kwargs"]["items"][1:], ["1001", "1002"], strict=True):
-        assert f'identity_user_id="{uid}"' in item["parts"][0]["text"]
+        assert f'sender_id="qq:{uid}"' in item["parts"][0]["text"]
     args, _ = await grant(plugin, sid="", query={"message_id": "101", "session_id": "group-b", "stream_id": "group-b"})
     assert (await plugin.lookup_original_messages(**args))["status"] == "unauthorized"
 
@@ -154,7 +157,7 @@ async def test_same_message_id_on_two_accounts_is_session_scoped(host):
     for sid, uid in (("group-a", "1001"), ("group-b", "1002")):
         original = next(m for m in host.messages if m["session_id"] == sid)
         args, before = await grant(plugin, sid=sid, items=[system_item(), item_for(original)])
-        assert f'identity_user_id="{uid}"' in str(before["modified_kwargs"]["items"])
+        assert f'sender_id="qq:{uid}"' in str(before["modified_kwargs"]["items"])
         result = await plugin.lookup_original_messages(**args)
         assert result["scope"]["session_id"] == sid
         assert result["records"][0]["user_id"] == uid
@@ -233,7 +236,7 @@ async def test_bot_and_user_separated(host):
 async def test_memory_person_id_bridge_and_native_tools_are_untouched(host):
     plugin = await host.plugin()
     args, before = await grant(plugin)
-    assert "identity_person_id" in str(before["modified_kwargs"]["items"])
+    assert "person_id" in str(before["modified_kwargs"]["items"])
     native = tool_defs(plugin)[-1]
     assert before["modified_kwargs"]["tool_definitions"][-1] == native
     await plugin.lookup_original_messages(**args)
@@ -245,8 +248,8 @@ async def test_memory_person_id_bridge_and_native_tools_are_untouched(host):
     await plugin.on_unload()
     await plugin.on_load()
     result = await plugin.before_replyer(items=[item_for(message())], item_schema_version=1, session_id="group-a")
-    assert 'identity_status="verified"' in str(result)
-    assert "identity_person_id" not in result["modified_kwargs"]["items"][0]["parts"][0]["text"]
+    assert 'sender_id="qq:1001"' in str(result)
+    assert "person_id" not in result["modified_kwargs"]["items"][0]["parts"][0]["text"]
 
 
 async def test_concurrency_singleflight_and_failure_recovery(host):
@@ -324,9 +327,9 @@ async def test_actual_hash_collision_never_chooses_latest_or_nickname(host, same
     args, before = await grant(plugin, items=source, query={"message_id": "m3nwnws"})
     output = str(before["modified_kwargs"]["items"])
     if same_time:
-        assert "identity_user_id=" not in output
+        assert "sender_id=" not in output
     else:
-        assert 'identity_user_id="1001"' in output and 'identity_user_id="1002"' in output
+        assert 'sender_id="qq:1001"' in output and 'sender_id="qq:1002"' in output
     result = await plugin.lookup_original_messages(**args)
     assert result["status"] == "ambiguous_id" and result["records"] == []
     args, _ = await grant(plugin, items=source, query={"message_id": b})
@@ -410,4 +413,4 @@ async def test_rpc_failure_preserves_other_context_and_recovers(host):
     assert 'identity_status="unknown"' in str(result)
     host.fail.clear()
     result = await plugin.before_replyer(items=source, item_schema_version=1, session_id="group-a")
-    assert 'identity_status="verified"' in str(result)
+    assert 'sender_id="qq:1001"' in str(result)

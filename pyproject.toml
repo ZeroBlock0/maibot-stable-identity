@@ -1,6 +1,6 @@
 [project]
 name = "maibot-stable-identity"
-version = "0.2.5"
+version = "0.2.6"
 authors = [{name = "Zero"}]
 requires-python = ">=3.12"
 dependencies = ["maibot-plugin-sdk==2.16.0", "tomlkit>=0.13.3"]

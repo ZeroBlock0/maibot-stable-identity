@@ -97,7 +97,7 @@ async def test_adapter_platform_qqid_reaches_both_model_requests(host, client_ty
         messages = [item for item in dispatched.kwargs["items"] if item["item_type"] == "UserMessageItem"]
         for item, uid in zip(messages, ["1001", "1002", "1001"], strict=True):
             header, body = item["parts"][0]["text"].split(">\n", 1)
-            assert f'identity_user_id="{uid}"' in header
-            assert 'identity_platform="qq"' in header
+            assert f'sender_id="qq:{uid}"' in header
+            assert header.count('sender_id="qq:') == 1
             assert "user_id=9999" in body
     assert host.messages == original
